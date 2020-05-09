@@ -14,3 +14,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', 'HomeController')->name('home');
+
+Route::get('/time-lapses', 'TimelapseController@index')->name('time-lapses.index');
+
+Route::get('/time-lapses/{timelapse}', 'TimelapseController@show')->name('time-lapses.show');
+
