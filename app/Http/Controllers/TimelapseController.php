@@ -139,15 +139,16 @@ class TimelapseController extends Controller
             }
         }
 
-        $outputPath = storage_path('app/public/' . $timelapse);
+        $outputPath = storage_path('app/public/' . $timelapse . '/');
 
         $process = new Process([
-            'avconv',
-            '-r', '30', // 30 fps
-            '-i', $outputPath . '/*.jpg',
+            'ffmpeg',
+            '-pattern_type', 'glob',
+            '-i', $outputPath . '"*.jpg"',
+            '-r', '30',
             '-vcodec', 'libx264',
-            '-vf', 'scale=1920:1080',
-            $outputPath . '/.mp4'
+            '-vf', 'scale=1280:720',
+            $outputPath . $timelapse . '.mp4'
         ]);
 
         $process->start();
@@ -159,7 +160,7 @@ class TimelapseController extends Controller
 
     private function start(string $directory, int $duration): void
     {
-        $outputPath = storage_path('app/public/' . $directory);
+        $outputPath = storage_path('app/public/' . $directory . '/');
         $timeout = $duration * 60 * 1000; // how long the timelapse will run for (in ms)
         $interval = $timeout / 900; // how long between each image (in ms). 900 frames (30seconds * 30fps)
 
