@@ -142,19 +142,18 @@ class TimelapseController extends Controller
 
         $outputPath = storage_path('app/public/' . $timelapse . '/');
 
-        $process = new Process([
-            'ffmpeg',
-            '-pattern_type', 'glob',
-            '-i', $outputPath . '"*.jpg"',
-            '-r', '30',
-            '-vcodec', 'libx264',
-            '-vf', 'scale=1280:720',
-            $outputPath . $timelapse . '.mp4'
-        ]);
+        $command = 'ffmpeg ' .
+            '-pattern_type glob ' .
+            '-i "' . $outputPath . '*.jpg" ' .
+            '-r 10 ' .
+            '-vcodec libx264 ' .
+            '-vf scale=1280:720 ' .
+            $outputPath . $timelapse . '.mp4 ' .
+            '> /dev/null 2>&1 & echo $!; ';
 
-        $process->start();
+        $pid = exec($command);
 
-        Storage::disk('public')->put($timelapse . '/avconv', $process->getPid());
+        Storage::disk('public')->put($timelapse . '/avconv', $pid);
 
         return redirect()->route('time-lapses.index');
     }
