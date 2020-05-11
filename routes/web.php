@@ -25,6 +25,8 @@ Route::post('/hotspot', 'HotspotController@update');
 
 Route::post('/time-lapses', 'TimelapseController@store')->name('time-lapses.store');
 
+Route::delete('/time-lapses/{timelapses}/raspistill', 'TimelapseController@stop')->name('time-lapses.stop');
+
 Route::delete('/time-lapses/{timelapse}', 'TimelapseController@destroy')->name('time-lapses.destroy');
 
 Route::post('/time-lapses/{timelapse}/avconv', 'TimelapseController@process')->name('time-lapses.process');
