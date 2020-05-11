@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
-use Symfony\Component\Process\Process;
 
 class TimelapseController extends Controller
 {
@@ -164,19 +163,16 @@ class TimelapseController extends Controller
         $timeout = $duration * 60 * 1000; // how long the timelapse will run for (in ms)
         $interval = $timeout / 900; // how long between each image (in ms). 900 frames (30seconds * 30fps)
 
-        $process = new Process([
-            'raspistill',
-            '--timestamp', // saves filename as unix timestamp
-            '--output', $outputPath . '%d.jpg',
-            '--timeout', $timeout,
-            '--timelapse', $interval
-        ]);
+        $command = 'raspistill ' .
+            '--timestamp ' .
+            '--output ' . $outputPath . '%d.jpg ' .
+            '--timeout ' . $timeout . ' ' .
+            '--timelapse ' . $interval . ' ' .
+            '> /dev/null 2>&1 & echo $!; ';
 
-        $process->setTimeout(($timeout / 1000) + 60); // timeout the process 1 minute after raspistill is due to finish
+        $pid = exec($command);
 
-        $process->start();
-
-        Storage::disk('public')->put($directory . '/raspistill', $process->getPid());
+        Storage::disk('public')->put($directory . '/raspistill', $pid);
     }
 
     private function getImages(string $directory): array
