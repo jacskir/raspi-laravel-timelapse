@@ -4,20 +4,46 @@
 
 @section('content')
     <div class="mb-4 text-right">
-        <button type="button" class="btn btn-primary">Make Video</button>
-        <button type="button" class="btn btn-primary">Download Video</button>
-        <button type="button" class="btn btn-warning">Stop Time-lapse</button>
-        <button type="button" class="btn btn-danger">Delete</button>
+        @if ($status === 'Ready to Process')
+            <form class="d-inline-block" action="{{ route('time-lapses.process', $timelapse) }}" method="POST">
+                @csrf
+
+                <button type="submit" class="btn btn-primary">Make Video</button>
+            </form>
+        @endif
+
+        @if ($status === 'Complete')
+            <a href="{{ asset('storage/' . $timelapse . '/' . $timelapse . '.mp4') }}" class="btn btn-primary">Download Video</a>
+        @endif
+
+        @if ($status === 'Taking Stills')
+            <form class="d-inline-block" action="{{ route('time-lapses.stop', $timelapse) }}" method="POST">
+                @method('DELETE')
+                @csrf
+
+                <button type="submit" class="btn btn-warning">Stop Time-lapse</button>
+            </form>
+        @endif
+
+        @if ($status === 'Complete' || $status === 'Ready to Process')
+            <form class="d-inline-block" action="{{ route('time-lapses.destroy', $timelapse) }}" method="POST">
+                @method('DELETE')
+                @csrf
+
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+        @endif
     </div>
 
     <div class="row">
-        @for ($i = 0; $i < 10; $i++)
-        <div class="col-6 col-md-4 col-lg-3">
-            <a href="https://cdn.shopify.com/s/files/1/1057/6184/articles/budgies_1024x1024.jpg">
-                <img class="shadow rounded w-100 mb-2" src="https://cdn.shopify.com/s/files/1/1057/6184/articles/budgies_1024x1024.jpg" alt="">
-            </a>
-            <p class="mb-4 text-center">19 Apr, 14:24:20</p>
-        </div>
-        @endfor
+        @foreach ($images as $image)
+            <div class="col-6 col-md-4 col-lg-3">
+                <a href="{{ asset('/storage/' . $image) }}">
+                    <img class="shadow rounded w-100 mb-2" src="{{ asset('/storage/' . $image) }}" alt="">
+                </a>
+                <p class="mb-4 text-center">{{ \Carbon\Carbon::createFromTimestamp(File::name($image))->format('d M, H:i:s') }}</p>
+            </div>
+        @endforeach
     </div>
+
 @endsection
