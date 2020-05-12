@@ -41,7 +41,7 @@ class HotspotController extends Controller
 
         file_put_contents('/etc/hostapd/hostapd.conf', $file);
 
-        exec('/bin/systemctl restart hostapd.service');
+        exec('sudo /bin/systemctl restart hostapd.service');
 
         return redirect()->route('hotspot');
     }
