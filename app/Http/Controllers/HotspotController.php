@@ -8,11 +8,20 @@ class HotspotController extends Controller
 {
     public function index()
     {
-        $file = '/etc/hostapd/hostapd.conf';
+        $file = file_get_contents('/etc/hostapd/hostapd.conf');
 
-        $ssid = substr(file($file)[2], strpos(file($file)[2], "=") + 1, -2);
+        preg_match('/(?<=^ssid=)(.*)$/m', $file, $matches);
 
-        return view('hotspot_settings', ['ssid' => $ssid]);
+        $ssid = $matches[0];
+
+        preg_match('/(?<=^wpa_passphrase=)(.*)$/m', $file, $matches);
+
+        $password = $matches[0];
+
+        return view('hotspot_settings', [
+            'ssid' => $ssid,
+            'password' => $password
+        ]);
     }
 
     public function update(Request $request)
@@ -25,16 +34,12 @@ class HotspotController extends Controller
         $ssid = $request->ssid;
         $password = $request->password;
 
-        $file = '/etc/hostapd/hostapd.conf';
+        $file = file_get_contents('/etc/hostapd/hostapd.conf');
 
-        $fileLines = file($file);
+        $file = preg_replace('/(?<=^ssid=)(.*)$/m', $ssid, $file);
+        $file = preg_replace('/(?<=^wpa_passphrase=)(.*)$/m', $password, $file);
 
-        $fileLines[2] = "ssid=" . $ssid . "\r\n";
-        $fileLines[10] = "wpa_passphrase=" . $password . "\r\n";
-
-        file_put_contents($file, $fileLines);
-
-        exec('/bin/systemctl restart hostapd');
+        file_put_contents('/etc/hostapd/hostapd.conf', $file);
 
         return redirect()->route('hotspot');
     }

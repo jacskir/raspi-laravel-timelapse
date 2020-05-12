@@ -20,7 +20,7 @@
 
                 <div class="form-group">
                     <label for="password">Wi-Fi Password:</label>
-                    <input type="text" class="form-control" id="password" name="password">
+                    <input type="text" class="form-control" id="password" name="password" value="{{ $password }}">
                     @error('password')
                     <small class="form-text" style="color:DarkRed">{{ $message }}</small>
                     @enderror
