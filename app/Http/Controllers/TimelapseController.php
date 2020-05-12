@@ -90,10 +90,10 @@ class TimelapseController extends Controller
 
     public function stop(string $timelapse)
     {
-        if ($this->getStatus($timelapse) === 'Taking Stills') {
+        if ($this->getStatus($timelapse) !== 'Taking Stills') {
             return redirect()
                 ->route('time-lapses.index')
-                ->with('error', 'A time-lapse is currently running');
+                ->with('error', 'This time-lapse isn\'t currently running');
         }
 
         // get the process id
